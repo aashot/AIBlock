@@ -42,4 +42,5 @@ I welcome contributions, especially additions to the `defaults.js` keyword list!
 
 ## 📄 License
 
-This project is open-sourced under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the [Creative Commons Attribution-NonCommercial 4.0 International License](LICENSE). 
+You are free to view, modify, and distribute the code for non-commercial purposes, but you may not use it to make a profit. See the [LICENSE](LICENSE) file for more details.
