@@ -24,22 +24,33 @@ function render(keywords) {
 }
 function loadSettings() {
   chrome.storage.sync.get(
-    { keywords: null, enabled: false, seeded: false },
+    { keywords: null, enabled: false, seeded: false, version: 1 },
     (result) => {
       toggleInput.checked = result.enabled;
-      if (result.keywords === null || !result.seeded) {
+      let kw = result.keywords;
+      if (kw === null || !result.seeded) {
+        kw = DEFAULT_KEYWORDS;
         chrome.storage.sync.set(
-          { keywords: DEFAULT_KEYWORDS, seeded: true },
-          () => {
-            render(DEFAULT_KEYWORDS);
-          }
+          { keywords: kw, seeded: true, version: KEYWORDS_VERSION },
+          () => render(kw)
+        );
+      } else if (result.version !== KEYWORDS_VERSION) {
+        const newKws = DEFAULT_KEYWORDS.filter((k) => !kw.includes(k));
+        if (newKws.length > 0) {
+          kw = [...kw, ...newKws];
+          kw = Array.from(new Set(kw));
+        }
+        chrome.storage.sync.set(
+          { keywords: kw, version: KEYWORDS_VERSION },
+          () => render(kw)
         );
       } else {
-        render(result.keywords);
+        render(kw);
       }
     }
   );
 }
+
 function addKeyword(keyword) {
   const trimmed = keyword.trim();
   if (!trimmed) return;
@@ -60,7 +71,7 @@ function removeKeyword(keyword) {
   });
 }
 function resetToDefaults() {
-  chrome.storage.sync.set({ keywords: DEFAULT_KEYWORDS }, () => {
+  chrome.storage.sync.set({ keywords: DEFAULT_KEYWORDS, version: KEYWORDS_VERSION }, () => {
     render(DEFAULT_KEYWORDS);
   });
 }

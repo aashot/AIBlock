@@ -219,3 +219,4 @@ const DEFAULT_KEYWORDS = [
   "neural processing",
   "tensor processing",
 ];
+const KEYWORDS_VERSION = 2;

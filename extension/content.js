@@ -25,15 +25,15 @@ function buildRegex(keywords) {
 }
 
 function findPostElements() {
-  const posts = document.querySelectorAll(
-    '[componentkey*="MAIN_FEED_RELEVANCE"]'
-  );
-  if (posts.length > 0) return posts;
-
-  const fallback = document.querySelectorAll(
-    'div[data-urn^="urn:li:activity"], div[data-urn^="urn:li:ugcPost"], div.feed-shared-update-v2'
-  );
-  return fallback;
+  const selectors = [
+    '[componentkey*="MAIN_FEED_RELEVANCE"]',
+    '[componentkey*="MAIN_FEED_PROMOTED"]',
+    '[componentkey*="MAIN_FEED_SUGGESTED"]',
+    'div[data-urn^="urn:li:activity"]',
+    'div[data-urn^="urn:li:ugcPost"]',
+    'div.feed-shared-update-v2'
+  ];
+  return document.querySelectorAll(selectors.join(', '));
 }
 
 function processPost(post) {
@@ -138,13 +138,20 @@ function stopObserver() {
 
 function loadSettingsAndScan() {
   chrome.storage.sync.get(
-    { keywords: null, enabled: false, seeded: false },
+    { keywords: null, enabled: false, seeded: false, version: 1 },
     (result) => {
       let kw = result.keywords;
 
       if (kw === null || !result.seeded) {
         kw = DEFAULT_KEYWORDS;
-        chrome.storage.sync.set({ keywords: kw, seeded: true });
+        chrome.storage.sync.set({ keywords: kw, seeded: true, version: KEYWORDS_VERSION });
+      } else if (result.version !== KEYWORDS_VERSION) {
+        const newKws = DEFAULT_KEYWORDS.filter((k) => !kw.includes(k));
+        if (newKws.length > 0) {
+          kw = [...kw, ...newKws];
+          kw = Array.from(new Set(kw));
+        }
+        chrome.storage.sync.set({ keywords: kw, version: KEYWORDS_VERSION });
       }
 
       keywordRegex = buildRegex(kw);
