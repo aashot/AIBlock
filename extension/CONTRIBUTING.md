@@ -35,6 +35,30 @@ If you want to improve performance or add a feature (e.g., Firefox support, adva
 4. Test thoroughly on the live LinkedIn feed.
 5. Submit a Pull Request.
 
+## 💡 Ideas for Contribution (Roadmap)
+
+Looking for something to work on? Here are some planned improvements and feature ideas you can help with:
+
+### Export & Sync
+- [ ] Keywords export/import
+- [ ] Sync custom keywords via Chrome Sync (`chrome.storage.sync`)
+
+### Core Functionality
+- [ ] **Whole-Word Matching:** Option to match whole words only, so short keywords like "AI" don't match inside words like "tr**ai**n" or "em**ai**l".
+- [ ] **Blur vs. Hide:** A toggle to apply a blur filter (`filter: blur(10px)`) to posts instead of completely hiding them (`display: none`), with a "Click to Reveal" button overlay.
+- [ ] **Regex Support:** Allow advanced users to use custom regular expressions in their blocklist.
+- [ ] **Whitelist Sources:** An allow-list for specific LinkedIn authors or company pages, so their AI posts are never blocked.
+- [ ] **Context Menu Quick-Add:** Right-click on highlighted text in LinkedIn to instantly add a phrase to the blocklist.
+- [ ] **Expand beyond LinkedIn:** Enable the extension to work on additional social media platforms.
+
+### Statistics & UI
+- [ ] **Historical Stats:** Keep track of blocks per day and show a mini-chart in the popup of "Time/Posts Saved this Week".
+- [ ] **Keyboard Shortcuts:** A quick hotkey to toggle the filter ON/OFF without opening the popup.
+
+### Code & Performance
+- [ ] **Debounced Storage Writes:** Throttle the `chrome.storage.local.set({ stats })` calls during rapid scrolling to prevent hitting Chrome extension storage write limits.
+- [ ] **Dynamic CSS Injection:** Instead of inline `style.display='none'`, inject a stylesheet and toggle a class on the body, which can be faster and cleaner.
+
 ## 🧑‍💻 Development Setup
 
 1. Clone your fork locally.
