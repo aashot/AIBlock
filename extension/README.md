@@ -27,7 +27,7 @@ If you want to try the extension locally or contribute to the code:
 2. Open Google Chrome and navigate to `chrome://extensions/`.
 3. Enable **Developer mode** (toggle switch in the top right corner).
 4. Click the **Load unpacked** button.
-5. Select the `no-ai` folder you just cloned.
+5. Select the `extension` folder you just cloned.
 6. The extension is now installed! Navigate to LinkedIn to see it in action.
 
 ## 🛠️ How it Works
