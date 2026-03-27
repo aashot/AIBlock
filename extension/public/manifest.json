@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AIBlock",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "Hide LinkedIn feed posts that contain specific keywords.",
   "permissions": ["storage", "contextMenus"],
   "background": {
