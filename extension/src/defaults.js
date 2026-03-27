@@ -1,5 +1,4 @@
-"use strict";
-const DEFAULT_KEYWORDS = [
+export const DEFAULT_KEYWORDS = [
   "artificial intelligence",
   "machine learning",
   "deep learning",
@@ -219,4 +218,5 @@ const DEFAULT_KEYWORDS = [
   "neural processing",
   "tensor processing",
 ];
-const KEYWORDS_VERSION = 2;
+
+export const KEYWORDS_VERSION = 2;

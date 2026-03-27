@@ -1,0 +1,14 @@
+{
+  "name": "aiblock",
+  "private": true,
+  "version": "1.0.1",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "dev": "vite --config vite.landing.config.js",
+    "preview": "vite preview --config vite.landing.config.js"
+  },
+  "devDependencies": {
+    "vite": "^8.0.3"
+  }
+}

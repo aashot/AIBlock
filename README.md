@@ -1,18 +1,36 @@
 # AIBlock Workspace
 
-Welcome to the AIBlock repository! AIBlock is a Chrome extension that acts as an adblocker for AI hype on LinkedIn. It automatically hides posts containing AI buzzwords, products, and tech jargon to keep your feed clean.
+AIBlock is a Chrome extension that acts as an adblocker for AI hype on LinkedIn. It automatically hides or blurs posts containing AI buzzwords, products, and tech jargon to keep your feed clean.
 
-This repository is structured as a monorepo containing both the extension source code and the promotional landing page.
+This repository is a monorepo containing both the Chrome extension and the promotional landing page, built with **Vite**.
+
+## Quick Start
+
+```bash
+npm install
+npm run build
+```
+
+Then load `dist/extension/` as an unpacked extension in Chrome (`chrome://extensions/` → Developer mode → Load unpacked).
+
+To preview the landing page locally:
+
+```bash
+npm run dev
+```
 
 ## Directory Structure
 
-* [**`/extension`**](./extension): Contains the source code for the AIBlock Chrome extension. Includes the background scripts, content scripts, popup UI, and extension assets.
-* [**`/landing-page`**](./landing-page): Contains the source code for the AIBlock landing page, which serves as the public face of the extension and points users to the Chrome Web Store.
+* [**`/extension/src`**](./extension/src): Extension source code (ES modules). Content scripts, popup UI, background worker, and shared libraries.
+* [**`/extension/public`**](./extension/public): Static assets copied to dist as-is (manifest.json, icons).
+* [**`/landing-page`**](./landing-page): Static landing page source (HTML/CSS).
+* [**`/scripts/build.js`**](./scripts/build.js): Build script that bundles both targets via the Vite API.
+* **`/dist`**: Build output (gitignored). `dist/extension/` is what Chrome loads; `dist/landing-page/` is the deployable site.
 
 ## Contributing
 
-We welcome contributions! Please navigate to the respective directories (`/extension` or `/landing-page`) to find specific instructions on how to set up the development environment, make changes, and submit pull requests.
+We welcome contributions! See the [Contributing Guidelines](extension/CONTRIBUTING.md) for how to get started.
 
 ## License
 
-This project is licensed under the Creative Commons Attribution-NonCommercial (CC BY-NC 4.0) License. This means the code is open source and you are free to view, learn from, and modify it, but **you cannot use it for commercial purposes or to make a profit**. Please see the [`LICENSE`](./LICENSE) file for more details.
+This project is licensed under the Creative Commons Attribution-NonCommercial (CC BY-NC 4.0) License. This means the code is open source and you are free to view, learn from, and modify it, but **you cannot use it for commercial purposes or to make a profit**. See the [`LICENSE`](./LICENSE) file for more details.
