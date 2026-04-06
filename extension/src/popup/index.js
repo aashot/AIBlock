@@ -16,10 +16,24 @@ const importError = document.getElementById("import-error");
 const statsText = document.getElementById("stats-text");
 const wholeWordInput = document.getElementById("whole-word-input");
 const hideModeToggle = document.getElementById("hide-mode-toggle");
+const modeToggle = document.getElementById("mode-toggle");
+const filterPanel = document.getElementById("filter-panel");
+const scorePanel = document.getElementById("score-panel");
 const whitelistForm = document.getElementById("whitelist-form");
 const whitelistInput = document.getElementById("whitelist-input");
 const whitelistList = document.getElementById("whitelist-list");
 const whitelistCount = document.getElementById("whitelist-count");
+const aiStatsText = document.getElementById("ai-stats-text");
+
+/* --- Mode switching --- */
+
+function showMode(mode) {
+  filterPanel.hidden = mode !== "filter";
+  scorePanel.hidden = mode !== "score";
+  modeToggle.querySelectorAll("button").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.mode === mode);
+  });
+}
 
 /* --- Generic list renderer --- */
 
@@ -111,6 +125,7 @@ function loadSettings() {
   getSettings((result) => {
     toggleInput.checked = result.enabled;
     wholeWordInput.checked = result.wholeWord;
+    showMode(result.mode);
     hideModeToggle.querySelectorAll("button").forEach((btn) => {
       btn.classList.toggle("active", btn.dataset.mode === result.hideMode);
     });
@@ -131,6 +146,14 @@ form.addEventListener("submit", (e) => {
 
 toggleInput.addEventListener("change", () => {
   saveSettings({ enabled: toggleInput.checked });
+});
+
+modeToggle.addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-mode]");
+  if (!btn || btn.classList.contains("active")) return;
+  const mode = btn.dataset.mode;
+  showMode(mode);
+  saveSettings({ mode });
 });
 
 wholeWordInput.addEventListener("change", () => {
@@ -186,7 +209,7 @@ importFile.addEventListener("change", () => {
         }
         saveSettings({ keywords: merged }, () => renderKeywords(merged));
       });
-    } catch {
+    } catch (e) {
       importError.textContent = e.message === "Too many keywords"
         ? "Import would exceed the 500 keyword limit. Remove some keywords first."
         : "Invalid file. Expected a JSON array of strings.";
@@ -199,19 +222,28 @@ importFile.addEventListener("change", () => {
 
 /* --- Stats --- */
 
+function renderStats(s) {
+  const { scanned, hidden, aiScored, aiDetected } = s;
+  statsText.textContent =
+    scanned === 0 ? "No posts scanned yet" : `${hidden} blocked of ${scanned} posts`;
+  if (aiScored === 0) {
+    aiStatsText.textContent = "No AI analysis yet";
+  } else {
+    const pct = Math.round((aiDetected / aiScored) * 100);
+    aiStatsText.textContent = `${pct}% of your feed is AI-generated (${aiScored} posts analyzed)`;
+  }
+}
+
 function updateStats() {
-  chrome.storage.local.get({ stats: { scanned: 0, hidden: 0 } }, (result) => {
-    const { scanned, hidden } = result.stats;
-    statsText.textContent =
-      scanned === 0 ? "No posts scanned yet" : `${hidden} blocked of ${scanned} posts`;
-  });
+  chrome.storage.local.get(
+    { stats: { scanned: 0, hidden: 0, aiScored: 0, aiDetected: 0 } },
+    (result) => renderStats(result.stats)
+  );
 }
 
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === "local" && changes.stats) {
-    const { scanned, hidden } = changes.stats.newValue || { scanned: 0, hidden: 0 };
-    statsText.textContent =
-      scanned === 0 ? "No posts scanned yet" : `${hidden} blocked of ${scanned} posts`;
+    renderStats(changes.stats.newValue || { scanned: 0, hidden: 0, aiScored: 0, aiDetected: 0 });
   }
 });
 

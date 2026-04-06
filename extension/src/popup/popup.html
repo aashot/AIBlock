@@ -4,67 +4,94 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LinkedIn Feed Filter</title>
+  <title>AIBlock</title>
   <link rel="stylesheet" href="./popup.css" />
 </head>
 
 <body>
   <div class="header">
-    <h1>Feed Filter</h1>
+    <h1>AIBlock</h1>
     <label class="toggle" id="toggle-label">
       <input type="checkbox" id="toggle-input" />
       <span class="toggle-slider"></span>
     </label>
   </div>
 
-  <div id="stats" class="stats">
-    <span id="stats-text">No posts scanned yet</span>
-  </div>
-
-  <div class="option-row">
-    <span class="option-label">Whole-word matching</span>
-    <label class="toggle toggle-sm">
-      <input type="checkbox" id="whole-word-input" />
-      <span class="toggle-slider"></span>
-    </label>
-  </div>
-
-  <div class="option-row">
-    <span class="option-label">Block mode</span>
-    <div class="segmented" id="hide-mode-toggle">
-      <button type="button" data-mode="hide" class="active">Hide</button>
-      <button type="button" data-mode="blur">Blur</button>
+  <div class="option-row" style="margin-bottom: 8px;">
+    <div class="segmented segmented-wide" id="mode-toggle">
+      <button type="button" data-mode="filter" class="active">Filter</button>
+      <button type="button" data-mode="score">AI Score</button>
     </div>
   </div>
 
-  <form id="add-form">
-    <input type="text" id="keyword-input" placeholder="Add custom keyword…" required autocomplete="off" />
-    <button type="submit">Add</button>
-  </form>
+  <!-- Filter mode -->
+  <div id="filter-panel">
+    <div id="stats" class="stats">
+      <span id="stats-text">No posts scanned yet</span>
+    </div>
 
-  <div class="section-header">
-    <span class="section-title" id="keyword-count">Keywords (0)</span>
-    <div class="section-actions">
-      <button id="export-btn" title="Export keywords">Export</button>
-      <button id="import-btn" title="Import keywords">Import</button>
-      <button id="reset-btn" title="Reset to defaults">Reset</button>
+    <div class="option-row">
+      <span class="option-label">Whole-word matching</span>
+      <label class="toggle toggle-sm">
+        <input type="checkbox" id="whole-word-input" />
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <div class="option-row">
+      <span class="option-label">Block mode</span>
+      <div class="segmented" id="hide-mode-toggle">
+        <button type="button" data-mode="hide" class="active">Hide</button>
+        <button type="button" data-mode="blur">Blur</button>
+      </div>
+    </div>
+
+    <form id="add-form">
+      <input type="text" id="keyword-input" placeholder="Add custom keyword…" required autocomplete="off" />
+      <button type="submit">Add</button>
+    </form>
+
+    <div class="section-header">
+      <span class="section-title" id="keyword-count">Keywords (0)</span>
+      <div class="section-actions">
+        <button id="export-btn" title="Export keywords">Export</button>
+        <button id="import-btn" title="Import keywords">Import</button>
+        <button id="reset-btn" title="Reset to defaults">Reset</button>
+      </div>
+    </div>
+    <input type="file" id="import-file" accept=".json" hidden />
+    <div id="import-error" class="import-error" hidden></div>
+
+    <ul id="keyword-list"></ul>
+
+    <div class="section-header" style="margin-top: 12px;">
+      <span class="section-title" id="whitelist-count">Allowed authors (0)</span>
+    </div>
+
+    <form id="whitelist-form">
+      <input type="text" id="whitelist-input" placeholder="Add author or company…" required autocomplete="off" />
+      <button type="submit">Add</button>
+    </form>
+
+    <ul id="whitelist-list"></ul>
+  </div>
+
+  <!-- Score mode -->
+  <div id="score-panel" hidden>
+    <div id="ai-stats" class="stats ai-stats">
+      <span id="ai-stats-text">No AI analysis yet</span>
+    </div>
+
+    <div class="score-info">
+      <p>Each post is analyzed for AI-written patterns:</p>
+      <ul>
+        <li>Overused AI vocabulary</li>
+        <li>Formulaic structure</li>
+        <li>Stylistic uniformity</li>
+      </ul>
+      <p>Click a badge on any post to highlight flagged words.</p>
     </div>
   </div>
-  <input type="file" id="import-file" accept=".json" hidden />
-  <div id="import-error" class="import-error" hidden></div>
-
-  <ul id="keyword-list"></ul>
-
-  <div class="section-header" style="margin-top: 12px;">
-    <span class="section-title" id="whitelist-count">Allowed authors (0)</span>
-  </div>
-
-  <form id="whitelist-form">
-    <input type="text" id="whitelist-input" placeholder="Add author or company…" required autocomplete="off" />
-    <button type="submit">Add</button>
-  </form>
-
-  <ul id="whitelist-list"></ul>
 
   <script type="module" src="./index.js"></script>
 </body>
