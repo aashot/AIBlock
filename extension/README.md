@@ -26,8 +26,8 @@ Tired of your LinkedIn feed being completely flooded with AI hype, ChatGPT promp
 
 ## 🚀 Installation 
 
-### Chrome Web Store (Coming Soon)
-*(Link to Chrome Web Store will be placed here once published)*
+### Chrome Web Store
+[**Add to Chrome — It's Free**](https://chromewebstore.google.com/detail/aiblock/dkbblapeemnkjlmplbhldkehkkicmdkp)
 
 ### Manual Installation (Developer Mode)
 
