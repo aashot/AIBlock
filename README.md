@@ -1,6 +1,6 @@
 # AIBlock Workspace
 
-AIBlock is a Chrome extension that acts as an adblocker for AI hype on LinkedIn. It automatically hides or blurs posts containing AI buzzwords, products, and tech jargon to keep your feed clean.
+AIBlock is a Chrome extension that filters AI hype and detects AI-written content on LinkedIn. It can hide or blur posts matching 220+ keywords, or score every post for AI-written patterns like formulaic vocabulary, structural uniformity, and stylistic red flags.
 
 This repository is a monorepo containing both the Chrome extension and the promotional landing page, built with **Vite**.
 

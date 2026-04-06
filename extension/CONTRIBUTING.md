@@ -27,7 +27,15 @@ LinkedIn frequently updates its DOM structure and class names. If the extension 
 2. Update the `findPostElements()` function in `extension/src/content/selectors.js` with the new primary or fallback selector.
 3. Run `npm run build`, reload the extension, test thoroughly on the live feed, and submit a Pull Request.
 
-### 4. Code Improvements / Features
+### 4. Improving AI Detection Signals
+The AI scorer in `extension/src/content/ai-detect/signals.js` uses weighted vocabulary words, structural patterns, and stylistic heuristics. You can help improve detection accuracy:
+
+1. **Add vocabulary signals:** Add overused AI-typical words to the appropriate weight tier (3 = strong markers, 2 = moderate, 1 = weak).
+2. **Add structural signals:** Write a new `test(text)` function that detects a formatting pattern common in AI-generated posts.
+3. **Tune weights:** If you notice false positives or missed detections, propose weight adjustments with before/after examples.
+4. Run `npm run build`, reload the extension, switch to AI Score mode, and verify on real LinkedIn posts.
+
+### 5. Code Improvements / Features
 If you want to improve performance or add a feature (e.g., Firefox support, advanced regex rules):
 1. Open an Issue first to discuss your idea with me.
 2. Fork the repo and create a new branch (`git checkout -b feature/amazing-feature`).
@@ -43,6 +51,12 @@ Looking for something to work on? Here are some planned improvements and feature
 - [ ] **Regex Support:** Allow advanced users to use custom regular expressions in their blocklist.
 - [ ] **Expand beyond LinkedIn:** Enable the extension to work on additional social media platforms (X, Reddit, etc.).
 - [ ] **Category Toggles:** Group keywords by category (companies, buzzwords, models) and let users enable/disable entire categories at once.
+- [ ] **Score Threshold Filtering:** Auto-hide or blur posts above a user-defined AI score threshold.
+
+### AI Detection
+- [ ] **Per-Author Score History:** Track average AI scores per author over time.
+- [ ] **Custom Signal Rules:** Let users add their own vocabulary words or phrases to the scorer.
+- [ ] **Confidence Calibration:** Collect community feedback to tune signal weights for better accuracy.
 
 ### Statistics & UI
 - [ ] **Historical Stats:** Track blocks per day and show a mini-chart in the popup of "Posts Saved this Week".
@@ -50,7 +64,7 @@ Looking for something to work on? Here are some planned improvements and feature
 - [ ] **Dark Mode:** Match the popup theme to the user's system/browser preference.
 
 ### Code & Performance
-- [ ] **Debounced Storage Writes:** Throttle `chrome.storage.local.set({ stats })` calls during rapid scrolling to avoid hitting Chrome storage write limits.
+- [x] **Debounced Storage Writes:** Throttle `chrome.storage.local.set({ stats })` calls during rapid scrolling to avoid hitting Chrome storage write limits.
 - [ ] **Firefox Support:** Port the extension to Firefox using WebExtension APIs.
 
 ## 🧑‍💻 Development Setup
