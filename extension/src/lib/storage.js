@@ -6,6 +6,7 @@ export const STORAGE_DEFAULTS = {
   wholeWord: false,
   hideMode: "blur",
   whitelist: [],
+  mode: "filter",
 };
 
 export function getSettings(cb) {

@@ -1,16 +1,21 @@
 import { HIDDEN_ATTR, BLURRED_ATTR } from "./styles.js";
-import { findPostElements, getPostText, isWhitelisted } from "./selectors.js";
+import { findPostElements, getPostText, getPostBodyText, isWhitelisted } from "./selectors.js";
+import { scorePost } from "./ai-detect/scorer.js";
+import { attachBadge, removeAllBadges } from "./ai-detect/badge.js";
+import { highlightPost, removeHighlights, removeAllHighlights } from "./ai-detect/highlight.js";
 
 let processedPosts = new WeakSet();
 let revealedPosts = new WeakSet();
-let stats = { scanned: 0, hidden: 0 };
+let aiScoredPosts = new WeakSet();
+let aiScoreCache = new WeakMap();
+let stats = { scanned: 0, hidden: 0, aiScored: 0, aiDetected: 0 };
 let saveStatsTimer = null;
 
 function saveStats() {
   if (saveStatsTimer) return;
   saveStatsTimer = setTimeout(() => {
     saveStatsTimer = null;
-    chrome.storage.local.set({ stats });
+    try { chrome.storage.local.set({ stats }); } catch {}
   }, 1000);
 }
 
@@ -82,25 +87,57 @@ function clearFilter(post) {
   if (overlay) overlay.remove();
 }
 
+function processAiScore(post, state) {
+  if (state.mode !== "score") return;
+  if (aiScoredPosts.has(post)) return;
+
+  const text = getPostBodyText(post);
+  if (text.trim().length < 30) return;
+
+  aiScoredPosts.add(post);
+
+  let result = aiScoreCache.get(post);
+  if (!result) {
+    result = scorePost(text);
+    aiScoreCache.set(post, result);
+  }
+
+  stats.aiScored++;
+  if (result.score > 0) stats.aiDetected++;
+  attachBadge(post, result, (showHighlights) => {
+    if (showHighlights) {
+      highlightPost(post, result);
+    } else {
+      removeHighlights(post);
+    }
+  });
+}
+
 function processPost(post, state) {
-  if (!state.filterEnabled || !state.keywordRegex) return;
-  if (processedPosts.has(post)) return;
+  if (!state.enabled) return;
 
-  processedPosts.add(post);
-  stats.scanned++;
+  if (state.mode === "filter") {
+    if (!state.keywordRegex) return;
+    if (processedPosts.has(post)) return;
+    processedPosts.add(post);
+    stats.scanned++;
 
-  if (revealedPosts.has(post)) return;
-  if (isWhitelisted(post, state.whitelist)) return;
-  const text = getPostText(post);
-  const matchedKeywords = findMatchedKeywords(text, state.keywordRegex);
-  if (matchedKeywords.length > 0) {
-    applyFilter(post, state.hideMode, matchedKeywords);
-    stats.hidden++;
+    if (revealedPosts.has(post)) return;
+    if (isWhitelisted(post, state.whitelist)) return;
+    const text = getPostText(post);
+    const matchedKeywords = findMatchedKeywords(text, state.keywordRegex);
+    if (matchedKeywords.length > 0) {
+      applyFilter(post, state.hideMode, matchedKeywords);
+      stats.hidden++;
+    }
+  } else {
+    processAiScore(post, state);
   }
 }
 
 export function scanAllPosts(state) {
-  if (!state.filterEnabled || !state.keywordRegex) return;
+  if (!state.enabled) return;
+  if (state.mode === "filter" && !state.keywordRegex) return;
 
   const posts = findPostElements();
   let i = 0;
@@ -124,7 +161,11 @@ export function scanAllPosts(state) {
 export function fullRescan(state) {
   processedPosts = new WeakSet();
   revealedPosts = new WeakSet();
-  stats = { scanned: 0, hidden: 0 };
+  aiScoredPosts = new WeakSet();
+  aiScoreCache = new WeakMap();
+  removeAllBadges();
+  removeAllHighlights();
+  stats = { scanned: 0, hidden: 0, aiScored: 0, aiDetected: 0 };
 
   const posts = findPostElements();
   let i = 0;
@@ -132,18 +173,8 @@ export function fullRescan(state) {
   function processBatch(deadline) {
     while (i < posts.length && deadline.timeRemaining() > 2) {
       const post = posts[i];
-      stats.scanned++;
-      const text = getPostText(post);
-      const matchedKeywords = state.keywordRegex
-        ? findMatchedKeywords(text, state.keywordRegex)
-        : [];
-      if (!state.keywordRegex || isWhitelisted(post, state.whitelist) || matchedKeywords.length === 0) {
-        clearFilter(post);
-      } else {
-        applyFilter(post, state.hideMode, matchedKeywords);
-        stats.hidden++;
-      }
-      processedPosts.add(post);
+      clearFilter(post);
+      processPost(post, state);
       i++;
     }
 
@@ -157,13 +188,35 @@ export function fullRescan(state) {
   requestIdleCallback(processBatch, { timeout: 1000 });
 }
 
+let rescanInterval = null;
+
+export function startPeriodicRescan(state) {
+  stopPeriodicRescan();
+  rescanInterval = setInterval(() => {
+    if (state.enabled) {
+      scanAllPosts(state);
+    }
+  }, 5000);
+}
+
+export function stopPeriodicRescan() {
+  if (rescanInterval) {
+    clearInterval(rescanInterval);
+    rescanInterval = null;
+  }
+}
+
 export function restoreAll() {
   const hidden = document.querySelectorAll(`[${HIDDEN_ATTR}], [${BLURRED_ATTR}]`);
   for (const el of hidden) {
     clearFilter(el);
   }
+  removeAllBadges();
+  removeAllHighlights();
   processedPosts = new WeakSet();
   revealedPosts = new WeakSet();
-  stats = { scanned: 0, hidden: 0 };
+  aiScoredPosts = new WeakSet();
+  aiScoreCache = new WeakMap();
+  stats = { scanned: 0, hidden: 0, aiScored: 0, aiDetected: 0 };
   saveStats();
 }
